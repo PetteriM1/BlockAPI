@@ -1,0 +1,5 @@
+name: BlockAPI
+main: me.petterim1.blockapi.Loader
+version: "${pom.version}"
+api: ["1.0.9"]
+author: PetteriM1
