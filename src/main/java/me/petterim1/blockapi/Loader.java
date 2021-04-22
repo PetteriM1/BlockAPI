@@ -2,10 +2,12 @@ package me.petterim1.blockapi;
 
 import cn.nukkit.Server;
 import cn.nukkit.block.*;
+import cn.nukkit.item.Item;
 import cn.nukkit.plugin.PluginBase;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -304,6 +306,10 @@ public class Loader extends PluginBase implements BlockID {
                     fullList[(id << 4) | data] = new BlockUnknown(id, data);
                 }
             }
+
+            if (Block.list[id] != null) {
+                Item.list[id] = Block.list[id];
+            }
         }
 
         try {
@@ -336,6 +342,25 @@ public class Loader extends PluginBase implements BlockID {
             Server.getInstance().getLogger().debug("[BlockAPI] " + registeredBlocks.size() + " custom blocks registered");
         } catch (Exception e) {
             Server.getInstance().getLogger().error("[BlockAPI] Registering custom blocks via reflection failed", e);
+        }
+    }
+
+    static void setRandomTicking(int blockId, boolean randomTickingEnabled) {
+        try {
+            Class<?> c_level = Class.forName("cn.nukkit.level.Level");
+
+            Field f_randomTickBlocks = c_level.getDeclaredField("randomTickBlocks");
+            f_randomTickBlocks.setAccessible(true);
+
+            Field f_modifiers = Field.class.getDeclaredField("modifiers");
+            f_modifiers.setAccessible(true);
+            f_modifiers.setInt(f_randomTickBlocks, f_randomTickBlocks.getModifiers() & ~Modifier.FINAL);
+
+            boolean[] randomTickBlocks = (boolean[]) f_randomTickBlocks.get(null);
+            randomTickBlocks[blockId] = randomTickingEnabled;
+            f_randomTickBlocks.set(null, randomTickBlocks);
+        } catch (Exception e) {
+            Server.getInstance().getLogger().error("[BlockAPI] Editing random ticking blocks list via reflection failed", e);
         }
     }
 }

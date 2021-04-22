@@ -49,4 +49,13 @@ public class API {
     public static Map<Integer, Class<? extends Block>> getAllCustomBlocks() {
         return Loader.registeredBlocks;
     }
+
+    /**
+     * Enable/disable random tick updates for a certain block
+     * @param blockId block id
+     * @param randomTickingEnabled random ticking enabled
+     */
+    public static void setRandomTickingEnabled(int blockId, boolean randomTickingEnabled) {
+        Loader.setRandomTicking(blockId, randomTickingEnabled);
+    }
 }
